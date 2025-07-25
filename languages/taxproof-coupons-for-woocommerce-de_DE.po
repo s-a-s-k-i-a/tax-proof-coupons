@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Tax‑Proof Coupons for WooCommerce\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-25 19:50+0000\n"
+"PO-Revision-Date: 2025-07-25 19:55+0000\n"
+"Last-Translator: Raumluft24 Redaktion (sl)\n"
+"Language-Team: Deutsch\n"
+"Language: de_DE\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.8.0; wp-6.8.2; php-8.1.33\n"
+"X-Domain: taxproof-coupons-for-woocommerce"
+
+#: tax-proof-coupons-plugin.php:57
+msgid "Apply coupon after tax"
+msgstr "Gutschein nach Steuern anwenden"
+
+#: tax-proof-coupons-plugin.php:58
+msgid ""
+"Deduct the fixed coupon amount from the order total including tax, ensuring "
+"the coupon value remains constant across all tax rates and locations."
+msgstr ""
+"Zieht den festen Gutscheinbetrag von der Bestellsumme inklusive Steuern ab, "
+"sodass der Gutscheinwert bei allen Mehrwertsteuersätzen und Standorten "
+"konstant bleibt."
+
+#. Description of the plugin
+msgid ""
+"Ensure fixed-value coupons always apply after tax, regardless of VAT rate or "
+"customer location."
+msgstr ""
+"Stelle sicher, dass feste Gutscheine immer nach Steuern angewendet werden, "
+"unabhängig vom Mehrwertsteuersatz oder dem Standort des Kunden."
+
+#. URI of the plugin
+msgid "https://github.com/s-a-s-k-i-a/tax-proof-coupons"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://saskialund.de"
+msgstr ""
+
+#. Author of the plugin
+msgid "Saskia Teichmann"
+msgstr ""
+
+#. Name of the plugin
+msgid "Tax‑Proof Coupons for WooCommerce"
+msgstr ""

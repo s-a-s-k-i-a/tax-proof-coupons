@@ -11,7 +11,7 @@
 ## Installation
 
 1. Extract the `tax-proof-coupons` folder into `/wp-content/plugins/`.
-2. Activate **Tax‑Proof Coupons** via **Plugins** in WordPress.
+2. Activate **Tax‑Proof Coupons for WooCommerce** via **Plugins** in WordPress.
 3. Edit or create a **Fixed Cart** coupon in WooCommerce and check **Apply coupon after tax**.
 
 ## Changelog
