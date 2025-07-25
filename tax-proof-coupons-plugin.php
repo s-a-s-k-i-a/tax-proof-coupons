@@ -48,6 +48,16 @@ class Plugin {
         add_action( 'woocommerce_coupon_options', [ $this, 'add_apply_after_tax_checkbox' ] );
         add_action( 'woocommerce_coupon_options_save', [ $this, 'save_apply_after_tax_checkbox' ], 10, 2 );
         add_filter( 'woocommerce_coupon_get_discount_amount', [ $this, 'apply_coupon_after_tax' ], 20, 5 );
+        add_action( 'init', [ $this, 'load_textdomain' ] );
+    }
+
+    /** Load plugin textdomain for translations. */
+    public function load_textdomain(): void {
+        load_plugin_textdomain(
+            'taxproof-coupons-for-woocommerce',
+            false,
+            dirname( plugin_basename( __FILE__ ) ) . '/languages'
+        );
     }
 
     /** Add "Apply after tax" checkbox to the coupon admin screen. */
