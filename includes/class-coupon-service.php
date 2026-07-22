@@ -53,6 +53,7 @@ final class Coupon_Service {
 	public function register_hooks(): void {
 		add_action( 'woocommerce_coupon_options', array( $this, 'add_apply_after_tax_checkbox' ) );
 		add_action( 'woocommerce_coupon_options_save', array( $this, 'save_apply_after_tax_checkbox' ), 10, 2 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_coupon_admin_script' ) );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'reset_runtime_state' ), 1 );
 
 		add_filter( 'woocommerce_coupon_get_items_to_apply', array( $this, 'prepare_coupon_distribution' ), 10, 3 );
@@ -92,14 +93,67 @@ final class Coupon_Service {
 	}
 
 	/**
-	 * Add the after-tax checkbox to fixed-cart coupons.
+	 * Load the coupon-type state controller only in the native coupon editor.
+	 *
+	 * @param string $hook_suffix Current admin page hook.
+	 */
+	public function enqueue_coupon_admin_script( string $hook_suffix ): void {
+		if ( ! in_array( $hook_suffix, array( 'post.php', 'post-new.php' ), true ) ) {
+			return;
+		}
+
+		$screen = get_current_screen();
+
+		if ( ! $screen || 'shop_coupon' !== $screen->post_type ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'taxproof-coupons-coupon-admin',
+			plugins_url( 'assets/js/admin-coupon.js', dirname( __DIR__ ) . '/tax-proof-coupons-plugin.php' ),
+			array( 'jquery' ),
+			Plugin::VERSION,
+			true
+		);
+	}
+
+	/**
+	 * Add the after-tax checkbox with a state matching the saved coupon type.
 	 */
 	public function add_apply_after_tax_checkbox(): void {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post ) {
+			return;
+		}
+
+		$coupon                  = new \WC_Coupon( $post->ID );
+		$is_supported            = 'fixed_cart' === $coupon->get_discount_type( 'edit' );
+		$supported_description   = __( 'Deduct the fixed coupon amount from the order total including tax, so the advertised gross amount stays constant regardless of VAT rate or customer location.', 'taxproof-coupons-for-woocommerce' );
+		$unsupported_description = __( 'This option is available only for fixed cart discount coupons. The selected coupon type is not currently supported.', 'taxproof-coupons-for-woocommerce' );
+		$description             = $is_supported ? $supported_description : $unsupported_description;
+		$custom_attributes       = array(
+			'aria-describedby'             => self::COUPON_META_KEY . '_description',
+			'aria-disabled'                => $is_supported ? 'false' : 'true',
+			'data-supported-description'   => $supported_description,
+			'data-unsupported-description' => $unsupported_description,
+		);
+
+		if ( ! $is_supported ) {
+			$custom_attributes['disabled'] = 'disabled';
+		}
+
 		\woocommerce_wp_checkbox(
 			array(
-				'id'          => self::COUPON_META_KEY,
-				'label'       => __( 'Apply coupon after tax', 'taxproof-coupons-for-woocommerce' ),
-				'description' => __( 'Deduct the fixed coupon amount from the order total including tax, so the advertised gross amount stays constant regardless of VAT rate or customer location.', 'taxproof-coupons-for-woocommerce' ),
+				'id'                => self::COUPON_META_KEY,
+				'label'             => __( 'Apply coupon after tax', 'taxproof-coupons-for-woocommerce' ),
+				'description'       => sprintf(
+					'<span id="%1$s">%2$s</span>',
+					esc_attr( self::COUPON_META_KEY . '_description' ),
+					esc_html( $description )
+				),
+				'value'             => $is_supported ? $coupon->get_meta( self::COUPON_META_KEY, true ) : 'no',
+				'custom_attributes' => $custom_attributes,
 			)
 		);
 	}
@@ -123,7 +177,18 @@ final class Coupon_Service {
 			return;
 		}
 
-		$coupon->update_meta_data( self::COUPON_META_KEY, isset( $_POST[ self::COUPON_META_KEY ] ) ? 'yes' : 'no' );
+		$requested_value = '';
+
+		if ( isset( $_POST[ self::COUPON_META_KEY ] ) && is_string( $_POST[ self::COUPON_META_KEY ] ) ) {
+			$requested_value = sanitize_text_field( wp_unslash( $_POST[ self::COUPON_META_KEY ] ) );
+		}
+
+		if ( 'fixed_cart' === $coupon->get_discount_type() && 'yes' === $requested_value ) {
+			$coupon->update_meta_data( self::COUPON_META_KEY, 'yes' );
+		} else {
+			$coupon->delete_meta_data( self::COUPON_META_KEY );
+		}
+
 		$coupon->save();
 	}
 

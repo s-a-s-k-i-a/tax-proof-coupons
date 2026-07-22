@@ -17,7 +17,7 @@ Start the site in LocalWP, then run:
 
 ```bash
 ./scripts/test-localwp.sh info
-./scripts/test-localwp.sh smoke 1.0.8
+./scripts/test-localwp.sh smoke 1.0.9
 ```
 
 `smoke` installs the exact public WordPress.org release ZIP, activates the current WooCommerce release, resets the dedicated tax/product/coupon fixture, and runs the same base, mixed-rate, oversized, tax-inclusive, and repeated-totals assertions used in Playground. The fixture deletes and recreates WooCommerce tax rates, so never point this runner at a customer, staging, or general-purpose local site. Override the site name only for another explicitly disposable test installation:

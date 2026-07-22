@@ -5,7 +5,7 @@ Tags: woocommerce, coupon, tax, discount
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,7 @@ Tax‑Proof Coupons for WooCommerce lets you define an eligible fixed-cart coupo
 
 = What does it do? =
 
-The plugin adds an **Apply coupon after tax** checkbox to fixed-cart coupons. When the option is enabled, each part of the coupon is converted using the tax rate of the product line it discounts.
+The plugin adds an **Apply coupon after tax** checkbox to the coupon editor. It can be enabled only for fixed-cart coupons. When the option is enabled, each part of the coupon is converted using the tax rate of the product line it discounts.
 
 For example, a 35.00 EUR coupon reduces eligible products by 35.00 EUR including tax, within the configured currency precision. WooCommerce still stores the required net discount and tax portion internally.
 
@@ -24,14 +24,14 @@ This is useful when a fixed promotional value should not become larger or smalle
 
 = What are the limits? =
 
-* Only fixed-cart coupons with **Apply coupon after tax** enabled are changed. Other coupons keep WooCommerce's native behavior.
+* Only fixed-cart coupons with **Apply coupon after tax** enabled are changed. For other coupon types, the option is disabled and explains why it is unavailable; those coupons keep WooCommerce's native behavior.
 * The effective discount cannot exceed the value of the eligible product lines. Shipping, fees, excluded products, and other non-discountable amounts do not increase that limit.
 * Displayed and stored amounts follow WooCommerce's configured currency precision and rounding.
 * The plugin does not choose tax rates, change product prices, replace a tax engine, or provide tax or legal advice.
 
 = Compatibility =
 
-Version 1.0.8 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, High-Performance Order Storage (HPOS), Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. Dedicated compatibility paths exist for WPML/WooCommerce Multilingual and Germanized Pro/StoreaBill. Compatibility still depends on the versions and configuration used by the store; report reproducible conflicts through the GitHub issue tracker or WordPress.org support forum.
+Version 1.0.9 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, High-Performance Order Storage (HPOS), Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. The 1.0.9 admin change does not alter the invoice or coupon calculation paths verified with finalized StoreaBill PDFs in 1.0.8. Dedicated compatibility paths exist for WPML/WooCommerce Multilingual and Germanized Pro/StoreaBill. Compatibility still depends on the versions and configuration used by the store; report reproducible conflicts through the GitHub issue tracker or WordPress.org support forum.
 
 == Installation ==
 1. Upload the `taxproof-coupons-for-woocommerce` folder to `/wp-content/plugins/`.
@@ -43,7 +43,10 @@ Version 1.0.8 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, 
 WooCommerce calculates fixed-cart discounts as net values before tax. If the amount entered by a shop owner is intended as a gross promotional value, its visible effect can otherwise vary with the applicable tax rate. This plugin performs the gross-to-net conversion for enabled coupons while leaving WooCommerce responsible for tax calculation.
 
 = Do I need to recreate existing coupons after updating? =
-No. Existing coupon settings remain unchanged. Version 1.0.8 corrects how StoreaBill resolves the persisted gross invoice discount; the WooCommerce calculation fixes were introduced in 1.0.6.
+No. Valid fixed-cart settings remain unchanged. If a coupon was changed to an unsupported type while an old after-tax flag remained stored, version 1.0.9 shows the option as disabled and removes that inactive flag the next time the coupon is saved.
+
+= Why is the option unavailable for my coupon? =
+The after-tax conversion currently supports fixed-cart coupons only. Percentage and fixed-product coupons keep WooCommerce's native behavior. Support for fixed-product coupons requires separate per-item calculations and is tracked in [GitHub issue #18](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/18) for the 1.1.0 roadmap.
 
 = What happens if the coupon is larger than the eligible products? =
 The discount is capped at the discountable gross value of the eligible product lines. It does not create a negative payable amount or consume shipping and fees merely to reach the configured coupon value.
@@ -55,6 +58,14 @@ Yes. The plugin allocates the coupon across eligible product lines and converts 
 No. WooCommerce and the store's tax configuration determine the rates. The plugin only changes how an enabled fixed-cart coupon is converted into WooCommerce's net discount values. Store owners remain responsible for validating their tax and invoice setup.
 
 == Changelog ==
+
+= 1.0.9 =
+
+Release date: July 22, 2026
+
+* **For store owners:** The after-tax checkbox is now available only for fixed-cart coupons. Selecting another coupon type immediately disables and clears it and shows a plain-language explanation.
+* **For developers:** Enforce the fixed-cart restriction again during persistence, remove stale metadata for unsupported types, and reject malformed checkbox input.
+* Added admin-state regressions plus real LocalWP coupon-editor, Cart Block, Checkout Block, tax-matrix, and release-content smoke coverage.
 
 = 1.0.8 =
 
