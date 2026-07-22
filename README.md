@@ -16,7 +16,7 @@
 
 **Tested up to:** 7.0
 
-**Stable tag:** 1.0.8
+**Stable tag:** 1.0.9
 
 **License:** GPLv2 or later
 
@@ -26,13 +26,13 @@ Treat selected fixed-cart coupons as gross promotional values and convert them i
 
 ## What it does
 
-Tax-Proof Coupons adds an **Apply coupon after tax** option to fixed-cart coupons. When enabled, a coupon entered as 35.00 EUR reduces eligible products by 35.00 EUR including tax, within WooCommerce currency precision. Each coupon share is converted using the tax rate of the product line it discounts, so mixed-rate carts do not rely on a cart-wide average.
+Tax-Proof Coupons adds an **Apply coupon after tax** option to the coupon editor and enables it only for fixed-cart coupons. When enabled, a coupon entered as 35.00 EUR reduces eligible products by 35.00 EUR including tax, within WooCommerce currency precision. Each coupon share is converted using the tax rate of the product line it discounts, so mixed-rate carts do not rely on a cart-wide average.
 
 The plugin does not choose tax rates, change product prices, discount otherwise ineligible amounts, or provide tax or legal advice. The effective discount is capped at the gross value of eligible product lines.
 
 ## Features
 
-- Adds **Apply coupon after tax** checkbox to coupon settings.
+- Adds an **Apply coupon after tax** checkbox that is enabled only for fixed-cart coupons and explains unsupported coupon types.
 - Converts each gross coupon share into the net discount WooCommerce expects using the current line's tax rate.
 - Keeps the intended gross amount stable within WooCommerce currency precision and the eligible product value.
 - Caps oversized coupons to the actually discountable gross cart value.
@@ -52,9 +52,26 @@ Only fixed-cart coupons with the option enabled are changed. Other coupon types 
 
 GitHub is the canonical source; WordPress.org SVN is a generated release mirror. See the [agent workflow](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/AGENTS.md), [testing guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/TESTING.md), and [release guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/RELEASING.md).
 
-Version 1.0.8 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, HPOS, Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. Automated coverage also exercises PHP 7.4–8.4, mixed tax rates, oversized coupons, tax-inclusive catalog prices, repeated totals calculations, Advanced Dynamic Pricing, and narrow StoreaBill and WPML/WCML contracts. The licensed StoreaBill smoke covers synchronized and finalized PDF invoices; a current licensed WPML/WCML build is still required before claiming unrestricted compatibility with a specific commercial release.
+Version 1.0.9 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, HPOS, Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. Its admin-only state change leaves the invoice and calculation paths verified with finalized StoreaBill PDFs in 1.0.8 unchanged. Automated coverage also exercises PHP 7.4–8.4, mixed tax rates, oversized coupons, tax-inclusive catalog prices, repeated totals calculations, Advanced Dynamic Pricing, and narrow StoreaBill and WPML/WCML contracts. A current licensed WPML/WCML build is still required before claiming unrestricted compatibility with a specific commercial release.
+
+## Roadmap
+
+- [Fixed-product gross discounts per eligible item](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/18) are planned for the 1.1.0 milestone. They are not implemented in 1.0.9.
+- Percentage coupons and free-shipping eligibility remain under WooCommerce's native behavior because they do not use the fixed gross-amount conversion.
 
 ## Changelog
+
+### 1.0.9
+
+**For store owners**
+
+- Enable the after-tax checkbox only for fixed-cart coupons.
+- Immediately disable and clear the checkbox after selecting another coupon type and explain why the option is unavailable.
+
+**For developers**
+
+- Enforce the fixed-cart restriction during persistence and remove stale metadata from unsupported coupon types.
+- Reject malformed checkbox input and cover valid, stale, unsupported, and forged states with regressions and LocalWP admin E2E.
 
 ### 1.0.8
 

@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.9 — 2026-07-22
+
+### For store owners
+
+- Enable the after-tax checkbox only while the coupon type is Fixed cart discount.
+- Immediately disable and clear the checkbox when another coupon type is selected, without restoring a discarded selection when switching back.
+- Explain in the coupon editor why the option is unavailable for the selected type.
+
+### For developers
+
+- Enforce the fixed-cart restriction in the save handler and delete stale plugin metadata for unsupported coupon types.
+- Reject malformed checkbox input instead of treating any submitted value as enabled.
+- Keep all user-facing descriptions translatable through the plugin text domain.
+- Add persistence regressions and verify the real WooCommerce editor, Cart Block, Checkout Block, tax matrix, and release artifact.
+
 ## 1.0.8 — 2026-07-22
 
 ### For store owners
