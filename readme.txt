@@ -5,7 +5,7 @@ Tags: woocommerce, coupon, tax, discount
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,7 @@ This is useful when a fixed promotional value should not become larger or smalle
 
 = Compatibility =
 
-Version 1.0.7 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, and High-Performance Order Storage (HPOS). Dedicated compatibility paths exist for WPML/WooCommerce Multilingual and Germanized Pro/StoreaBill. Compatibility still depends on the versions and configuration used by the store; report reproducible conflicts through the GitHub issue tracker or WordPress.org support forum.
+Version 1.0.8 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, High-Performance Order Storage (HPOS), Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. Dedicated compatibility paths exist for WPML/WooCommerce Multilingual and Germanized Pro/StoreaBill. Compatibility still depends on the versions and configuration used by the store; report reproducible conflicts through the GitHub issue tracker or WordPress.org support forum.
 
 == Installation ==
 1. Upload the `taxproof-coupons-for-woocommerce` folder to `/wp-content/plugins/`.
@@ -43,7 +43,7 @@ Version 1.0.7 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, 
 WooCommerce calculates fixed-cart discounts as net values before tax. If the amount entered by a shop owner is intended as a gross promotional value, its visible effect can otherwise vary with the applicable tax rate. This plugin performs the gross-to-net conversion for enabled coupons while leaving WooCommerce responsible for tax calculation.
 
 = Do I need to recreate existing coupons after updating? =
-No. Existing coupon settings remain unchanged. Version 1.0.7 only improves documentation; the calculation fixes were introduced in 1.0.6.
+No. Existing coupon settings remain unchanged. Version 1.0.8 corrects how StoreaBill resolves the persisted gross invoice discount; the WooCommerce calculation fixes were introduced in 1.0.6.
 
 = What happens if the coupon is larger than the eligible products? =
 The discount is capped at the discountable gross value of the eligible product lines. It does not create a negative payable amount or consume shipping and fees merely to reach the configured coupon value.
@@ -55,6 +55,14 @@ Yes. The plugin allocates the coupon across eligible product lines and converts 
 No. WooCommerce and the store's tax configuration determine the rates. The plugin only changes how an enabled fixed-cart coupon is converted into WooCommerce's net discount values. Store owners remain responsible for validating their tax and invoice setup.
 
 == Changelog ==
+
+= 1.0.8 =
+
+Release date: July 22, 2026
+
+* **For store owners:** Fixed a possible one-cent difference in StoreaBill's aggregate invoice discount for small gross coupons in mixed-tax orders. Invoice totals, taxes, and coupon settings remain unchanged.
+* **For developers:** Resolve StoreaBill's nested invoice/order wrappers before reading persisted WooCommerce coupon metadata.
+* Added a StoreaBill wrapper-contract regression and verified synchronized, finalized PDFs with Germanized Pro/StoreaBill 4.3.4.
 
 = 1.0.7 =
 

@@ -16,7 +16,7 @@
 
 **Tested up to:** 7.0
 
-**Stable tag:** 1.0.7
+**Stable tag:** 1.0.8
 
 **License:** GPLv2 or later
 
@@ -52,9 +52,21 @@ Only fixed-cart coupons with the option enabled are changed. Other coupon types 
 
 GitHub is the canonical source; WordPress.org SVN is a generated release mirror. See the [agent workflow](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/AGENTS.md), [testing guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/TESTING.md), and [release guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/RELEASING.md).
 
-Version 1.0.7 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, and HPOS. Automated coverage also exercises PHP 7.4–8.4, mixed tax rates, oversized coupons, tax-inclusive catalog prices, repeated totals calculations, Advanced Dynamic Pricing, and a narrow WPML/WCML contract. A current licensed WPML/WCML build is still required before claiming unrestricted compatibility with a specific commercial release.
+Version 1.0.8 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, HPOS, Germanized 4.0.10, and Germanized Pro/StoreaBill 4.3.4. Automated coverage also exercises PHP 7.4–8.4, mixed tax rates, oversized coupons, tax-inclusive catalog prices, repeated totals calculations, Advanced Dynamic Pricing, and narrow StoreaBill and WPML/WCML contracts. The licensed StoreaBill smoke covers synchronized and finalized PDF invoices; a current licensed WPML/WCML build is still required before claiming unrestricted compatibility with a specific commercial release.
 
 ## Changelog
+
+### 1.0.8
+
+**For store owners**
+
+- Fixed a possible one-cent difference in StoreaBill's aggregate invoice discount for small gross coupons in mixed-tax orders.
+- Kept the payable invoice total, tax totals, coupon settings, and normal WooCommerce behavior unchanged.
+
+**For developers**
+
+- Resolve StoreaBill's invoice and order wrapper layers before reading the persisted WooCommerce coupon metadata.
+- Added a wrapper-contract regression and verified finalized PDFs with Germanized Pro/StoreaBill 4.3.4.
 
 ### 1.0.7
 

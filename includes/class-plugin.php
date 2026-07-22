@@ -21,7 +21,7 @@ final class Plugin {
 	/**
 	 * Plugin version.
 	 */
-	public const VERSION = '1.0.7';
+	public const VERSION = '1.0.8';
 
 	/**
 	 * Singleton instance.
