@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       Tax‑Proof Coupons for WooCommerce
  * Plugin URI:        https://github.com/s-a-s-k-i-a/tax-proof-coupons
- * Description:       Ensure fixed-value coupons always apply after tax, regardless of VAT rate or customer location.
- * Version:           1.0.6
+ * Description:       Convert enabled fixed-cart coupon values from gross to net across eligible WooCommerce products.
+ * Version:           1.0.7
  * Author:            Saskia Teichmann
  * Author URI:        https://isla-stud.io
  * License:           GPL-2.0+

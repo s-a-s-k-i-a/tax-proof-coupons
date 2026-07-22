@@ -16,27 +16,35 @@
 
 **Tested up to:** 7.0
 
-**Stable tag:** 1.0.6
+**Stable tag:** 1.0.7
 
 **License:** GPLv2 or later
 
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
-Always apply fixed-value cart coupons after tax, no matter the VAT rate or customer location.
+Treat selected fixed-cart coupons as gross promotional values and convert them into the net discounts WooCommerce expects.
+
+## What it does
+
+Tax-Proof Coupons adds an **Apply coupon after tax** option to fixed-cart coupons. When enabled, a coupon entered as 35.00 EUR reduces eligible products by 35.00 EUR including tax, within WooCommerce currency precision. Each coupon share is converted using the tax rate of the product line it discounts, so mixed-rate carts do not rely on a cart-wide average.
+
+The plugin does not choose tax rates, change product prices, discount otherwise ineligible amounts, or provide tax or legal advice. The effective discount is capped at the gross value of eligible product lines.
 
 ## Features
 
 - Adds **Apply coupon after tax** checkbox to coupon settings.
 - Converts each gross coupon share into the net discount WooCommerce expects using the current line's tax rate.
-- Keeps the intended gross amount stable within WooCommerce currency precision and the eligible cart value.
+- Keeps the intended gross amount stable within WooCommerce currency precision and the eligible product value.
 - Caps oversized coupons to the actually discountable gross cart value.
 - **StoreaBill/Germanized Pro Integration** via a dedicated compatibility layer.
-- **WPML/WCML Compatibility** via an isolated order-total correction layer.
+- **WPML/WCML compatibility path** for persisting the valid WooCommerce checkout total.
 - **Enhanced Admin Display** showing the persisted gross, net, and tax split.
+
+Only fixed-cart coupons with the option enabled are changed. Other coupon types and disabled coupons retain native WooCommerce behavior.
 
 ## Installation
 
-1. Extract the `tax-proof-coupons` folder into `/wp-content/plugins/`.
+1. Extract the `taxproof-coupons-for-woocommerce` folder into `/wp-content/plugins/`.
 2. Activate **Tax‑Proof Coupons for WooCommerce** via **Plugins** in WordPress.
 3. Edit or create a **Fixed Cart** coupon in WooCommerce and check **Apply coupon after tax**.
 
@@ -44,15 +52,35 @@ Always apply fixed-value cart coupons after tax, no matter the VAT rate or custo
 
 GitHub is the canonical source; WordPress.org SVN is a generated release mirror. See the [agent workflow](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/AGENTS.md), [testing guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/TESTING.md), and [release guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/RELEASING.md).
 
+Version 1.0.7 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, and HPOS. Automated coverage also exercises PHP 7.4–8.4, mixed tax rates, oversized coupons, tax-inclusive catalog prices, repeated totals calculations, Advanced Dynamic Pricing, and a narrow WPML/WCML contract. A current licensed WPML/WCML build is still required before claiming unrestricted compatibility with a specific commercial release.
+
 ## Changelog
+
+### 1.0.7
+
+**For store owners**
+
+- Added a plain-language explanation, a worked example, explicit limits, and upgrade guidance.
+- Corrected the installation folder and historical release dates.
+- No coupon calculation or setting changed in this release.
+
+**For developers**
+
+- Separated user-visible behavior from implementation details and qualified compatibility claims.
+- Documented the exact WooCommerce calculation boundary without tax-compliance guarantees.
 
 ### 1.0.6
 
-- Fix negative WPML/WCML completed-order totals.
-- Support mixed tax rates with per-line gross allocation.
-- Stabilize repeated direct WooCommerce totals calculations.
-- Correct checkout coupon-item persistence for HPOS and Checkout Block.
-- Add unit, Playground cart, and browser E2E regressions.
+**For store owners**
+
+- Fixed negative saved order totals in the WPML/WCML path.
+- Fixed mixed-tax carts, oversized coupons, and unstable repeated calculations.
+
+**For developers**
+
+- Added per-line gross allocation and per-distribution state reset.
+- Corrected checkout coupon-item persistence for HPOS and Checkout Block.
+- Added unit, Playground cart, Advanced Dynamic Pricing, and browser E2E regressions.
 
 ### 1.0.5
 
