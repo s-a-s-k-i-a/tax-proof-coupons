@@ -59,13 +59,9 @@ final class StoreaBill_Integration {
 	 * @return float
 	 */
 	public function filter_invoice_discount_total( float $total, $invoice ): float {
-		if ( ! is_object( $invoice ) || ! method_exists( $invoice, 'get_order' ) ) {
-			return $total;
-		}
+		$order = $this->resolve_order( $invoice );
 
-		$order = $invoice->get_order();
-
-		if ( ! $order instanceof \WC_Order || ! $this->coupon_service->order_has_tax_proof_coupons( $order ) ) {
+		if ( ! $order || ! $this->coupon_service->order_has_tax_proof_coupons( $order ) ) {
 			return $total;
 		}
 
@@ -113,16 +109,22 @@ final class StoreaBill_Integration {
 	 * @return \WC_Order|null
 	 */
 	private function resolve_order( $subject ): ?\WC_Order {
-		if ( $subject instanceof \WC_Order ) {
-			return $subject;
-		}
+		for ( $depth = 0; $depth < 4; $depth++ ) {
+			if ( $subject instanceof \WC_Order ) {
+				return $subject;
+			}
 
-		if ( is_object( $subject ) && method_exists( $subject, 'get_order' ) ) {
+			if ( ! is_object( $subject ) || ! is_callable( array( $subject, 'get_order' ) ) ) {
+				return null;
+			}
+
 			$order = $subject->get_order();
 
-			if ( $order instanceof \WC_Order ) {
-				return $order;
+			if ( $order === $subject ) {
+				return null;
 			}
+
+			$subject = $order;
 		}
 
 		return null;

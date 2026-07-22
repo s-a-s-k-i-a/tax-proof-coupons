@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.0.8 — 2026-07-22
+
+### For store owners
+
+- Correct StoreaBill's aggregate gross invoice discount when its own line rounding differs by one cent from the persisted Tax-Proof coupon amount.
+- Keep the payable invoice total, tax totals, coupon settings, and native behavior for unrelated coupons unchanged.
+
+### For developers
+
+- Resolve StoreaBill 4.3.4's nested invoice-to-order-wrapper-to-WooCommerce-order contract before reading coupon metadata.
+- Add a contract regression for nested wrappers and unsupported subjects.
+- Verify real synchronized and finalized PDFs for 19%, mixed 19%/7%, both tax lines remaining, tax-inclusive catalog prices, and a fully discounted zero-total order.
+
 ## 1.0.7 — 2026-07-22
 
 ### For store owners
