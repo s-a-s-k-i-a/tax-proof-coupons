@@ -6,6 +6,7 @@
 - Version values match in the plugin header, `Plugin::VERSION`, `readme.txt`, and changelogs.
 - `Tested up to` reflects a real test, not an assumption.
 - The GitHub `wordpress.org` environment has a required maintainer approval and the `SVN_USERNAME` and `SVN_PASSWORD` secrets.
+- `./scripts/test-release-contents.sh` passes; the build also audits its staged files before creating the ZIP.
 
 ## Release
 
