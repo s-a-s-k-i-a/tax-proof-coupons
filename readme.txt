@@ -1,20 +1,21 @@
 === Tax‑Proof Coupons for WooCommerce ===
 Contributors: Jyria
-Donate link: https://www.saskialund.de/donate/
+Donate link: https://isla-stud.io/donate/
 Tags: woocommerce, coupon, tax, discount
 Requires at least: 6.5
-Tested up to: 6.9
-Stable tag: 1.0.5
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 Ensure fixed-value coupons always apply after tax, regardless of customer location or VAT rate.
 
 == Description ==
-Tax‑Proof Coupons for WooCommerce adds a simple checkbox “Apply coupon after tax” to the coupon edit screen. When enabled on a fixed-cart coupon, the plugin converts the gross coupon value you enter into the correct net discount and applies it across the cart items—guaranteeing the exact gross amount is deducted, no matter the VAT rate or customer location.
+Tax‑Proof Coupons for WooCommerce adds a simple checkbox “Apply coupon after tax” to the coupon edit screen. When enabled on a fixed-cart coupon, the plugin converts each gross coupon share using the tax rate of the discounted line. The intended gross value stays stable across eligible cart items and customer tax locations, subject to WooCommerce currency precision and the discountable cart value.
 
 == Installation ==
-1. Upload the `tax-proof-coupons` folder to `/wp-content/plugins/`.
+1. Upload the `taxproof-coupons-for-woocommerce` folder to `/wp-content/plugins/`.
 2. Activate the plugin from the **Plugins** screen in WordPress.
 3. In WooCommerce → Coupons, edit a fixed-cart coupon and check **Apply coupon after tax**.
 
@@ -22,10 +23,18 @@ Tax‑Proof Coupons for WooCommerce adds a simple checkbox “Apply coupon after
 = Why is this needed? =
 By default, WooCommerce adjusts fixed-cart coupons by the current VAT rate, causing the discount to vary by customer location. Tax‑Proof Coupons ensures a fixed gross coupon value remains fixed across all taxes.
 
-== Screenshots ==
-1. Coupon edit screen showing the new checkbox.
-
 == Changelog ==
+
+= 1.0.6 =
+
+Release date: July 22, 2026
+
+* Fix negative completed-order totals in the WPML/WCML compatibility path.
+* Allocate gross discounts per line tax rate for mixed-rate carts.
+* Keep repeated WooCommerce totals calculations deterministic for compatibility plugins.
+* Use the supported checkout coupon-item hook and HPOS-safe persistence.
+* Preserve native WooCommerce behavior when catalog prices include tax.
+* Add automated unit, cart, Checkout Block, HPOS, and WPML-contract regression tests.
 
 = 1.0.5 =
 
@@ -52,7 +61,7 @@ Release date: January 2025
 
 = 1.0.3 =
 
-Release date: August 3rd 2025
+Release date: August 3, 2025
 
 * Ensuring unique namespace
 * Added Requires plugins plugin header

@@ -1,0 +1,37 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Tax-Proof Coupons with Advanced Dynamic Pricing",
+    "author": "s-a-s-k-i-a",
+    "description": "Disposable compatibility smoke with the current WordPress.org ADP build."
+  },
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "plugins": [
+    "woocommerce",
+    "advanced-dynamic-pricing-for-woocommerce"
+  ],
+  "steps": [
+    {
+      "step": "activatePlugin",
+      "pluginPath": "/wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tax-proof-coupons-plugin.php"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp eval-file /wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tests/playground/setup-store.php"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp eval-file /wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tests/playground/assert-cart-scenarios.php"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp plugin status advanced-dynamic-pricing-for-woocommerce"
+    }
+  ]
+}

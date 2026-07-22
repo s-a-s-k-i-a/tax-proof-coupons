@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    name: PHP ${{ matrix.php }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php:
+          - '7.4'
+          - '8.3'
+          - '8.4'
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Validate versions
+        run: php scripts/check-version.php
+
+      - name: Unit tests
+        run: composer test
+
+      - name: Coding standards and compatibility
+        run: composer lint
+
+      - name: PHP syntax
+        run: find . -path './vendor' -prune -o -name '*.php' -print0 | xargs -0 -n1 php -l
+
+  playground:
+    name: WooCommerce Playground
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@1e60f620b9541dca151127c8f7a0734836342c3b
+        with:
+          node-version: '22'
+
+      - name: Run WooCommerce cart regressions
+        run: ./scripts/test-playground.sh
+
+  plugin-check:
+    name: WordPress Plugin Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+
+      - name: Build distribution
+        run: ./scripts/build-release.sh
+
+      - name: Extract distribution
+        run: unzip -q dist/taxproof-coupons-for-woocommerce-*.zip -d plugin-check-build
+
+      - name: Run Plugin Check
+        uses: WordPress/plugin-check-action@98a1788320d0add90df2d8183934ecccbc4e05d2
+        with:
+          build-dir: plugin-check-build/taxproof-coupons-for-woocommerce
+          wp-version: latest

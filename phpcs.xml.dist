@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="Tax-Proof Coupons">
+	<description>WordPress.org and PHP 7.4 compatibility checks.</description>
+
+	<file>tax-proof-coupons-plugin.php</file>
+	<file>includes</file>
+	<file>tests</file>
+
+	<exclude-pattern>vendor/*</exclude-pattern>
+
+	<arg name="basepath" value="."/>
+	<arg name="colors"/>
+	<arg value="sp"/>
+
+	<rule ref="WordPress"/>
+	<rule ref="WordPress-Docs"/>
+	<rule ref="PHPCompatibilityWP">
+		<properties>
+			<property name="testVersion" value="7.4-"/>
+		</properties>
+	</rule>
+
+	<config name="minimum_supported_wp_version" value="6.5"/>
+	<config name="testVersion" value="7.4-"/>
+</ruleset>

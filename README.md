@@ -1,11 +1,25 @@
-# Tax‑Proof Coupons for WooCommerce #
+# Tax‑Proof Coupons for WooCommerce
+
 **Contributors:** Jyria
-**Donate link:** https://www.saskialund.de/donate/
-**Tags:** woocommerce, coupon, tax, discount  
-**Requires at least:** 6.5  
-**Tested up to:** 6.9  
-**Stable tag:** 1.0.5
-**License:** GPLv2 or later  
+
+**Donate link:** https://isla-stud.io/donate/
+
+**Tags:** woocommerce, coupon, tax, discount
+
+**Requires at least:** 6.5
+
+**Requires PHP:** 7.4
+
+**Requires WooCommerce:** 8.8
+
+**Tested with WooCommerce:** 10.9.4
+
+**Tested up to:** 7.0
+
+**Stable tag:** 1.0.6
+
+**License:** GPLv2 or later
+
 **License URI:** https://www.gnu.org/licenses/gpl-2.0.html
 
 Always apply fixed-value cart coupons after tax, no matter the VAT rate or customer location.
@@ -13,8 +27,8 @@ Always apply fixed-value cart coupons after tax, no matter the VAT rate or custo
 ## Features
 
 - Adds **Apply coupon after tax** checkbox to coupon settings.
-- Converts the gross coupon value into the net discount WooCommerce expects, while keeping the applied gross discount exact.
-- Guarantees the exact gross amount is deducted in cart and checkout.
+- Converts each gross coupon share into the net discount WooCommerce expects using the current line's tax rate.
+- Keeps the intended gross amount stable within WooCommerce currency precision and the eligible cart value.
 - Caps oversized coupons to the actually discountable gross cart value.
 - **StoreaBill/Germanized Pro Integration** via a dedicated compatibility layer.
 - **WPML/WCML Compatibility** via an isolated order-total correction layer.
@@ -26,7 +40,19 @@ Always apply fixed-value cart coupons after tax, no matter the VAT rate or custo
 2. Activate **Tax‑Proof Coupons for WooCommerce** via **Plugins** in WordPress.
 3. Edit or create a **Fixed Cart** coupon in WooCommerce and check **Apply coupon after tax**.
 
+## Development
+
+GitHub is the canonical source; WordPress.org SVN is a generated release mirror. See the [agent workflow](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/AGENTS.md), [testing guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/TESTING.md), and [release guide](https://github.com/s-a-s-k-i-a/tax-proof-coupons/blob/main/docs/RELEASING.md).
+
 ## Changelog
+
+### 1.0.6
+
+- Fix negative WPML/WCML completed-order totals.
+- Support mixed tax rates with per-line gross allocation.
+- Stabilize repeated direct WooCommerce totals calculations.
+- Correct checkout coupon-item persistence for HPOS and Checkout Block.
+- Add unit, Playground cart, and browser E2E regressions.
 
 ### 1.0.5
 

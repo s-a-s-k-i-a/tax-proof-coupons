@@ -1,0 +1,34 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "meta": {
+    "title": "Tax-Proof Coupons development site",
+    "author": "s-a-s-k-i-a",
+    "description": "Disposable WordPress and WooCommerce environment for plugin development and browser smoke tests."
+  },
+  "preferredVersions": {
+    "php": "8.3",
+    "wp": "latest"
+  },
+  "features": {
+    "networking": true
+  },
+  "login": true,
+  "landingPage": "/wp-admin/",
+  "plugins": [
+    "woocommerce"
+  ],
+  "steps": [
+    {
+      "step": "activatePlugin",
+      "pluginPath": "/wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tax-proof-coupons-plugin.php"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp eval-file /wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tests/playground/setup-store.php"
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp eval-file /wordpress/wp-content/plugins/taxproof-coupons-for-woocommerce/tests/playground/assert-cart-scenarios.php"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+name: Bug report
+description: Report a reproducible coupon or compatibility defect.
+title: '[Bug] '
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What is wrong, and what should happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: WordPress, WooCommerce, PHP, plugin version, theme, checkout type, HPOS, and relevant third-party plugin versions.
+    validations:
+      required: true
+  - type: textarea
+    id: tax-settings
+    attributes:
+      label: Tax and coupon settings
+      description: Prices include tax, display settings, customer country, tax rates/classes, coupon type/value/restrictions.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps and calculation
+      description: Include line prices, quantities, tax rates, expected subtotal/discount/tax/total, and actual values.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Screenshots, logs without secrets, order ID, and a minimal test case.
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Concrete outcomes that prove the issue is fixed.

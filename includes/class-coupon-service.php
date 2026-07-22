@@ -55,15 +55,12 @@ final class Coupon_Service {
 		add_action( 'woocommerce_coupon_options_save', array( $this, 'save_apply_after_tax_checkbox' ), 10, 2 );
 		add_action( 'woocommerce_before_calculate_totals', array( $this, 'reset_runtime_state' ), 1 );
 
+		add_filter( 'woocommerce_coupon_get_items_to_apply', array( $this, 'prepare_coupon_distribution' ), 10, 3 );
 		add_filter( 'woocommerce_coupon_get_discount_amount', array( $this, 'apply_coupon_after_tax' ), 20, 5 );
 		add_filter( 'woocommerce_coupon_discount_amount_html', array( $this, 'adjust_coupon_display_amount' ), 20, 2 );
 		add_filter( 'woocommerce_cart_totals_coupon_html', array( $this, 'adjust_cart_coupon_display' ), 20, 3 );
 
-		add_action( 'woocommerce_create_order_coupon_item', array( $this, 'set_correct_coupon_amounts' ), 10, 4 );
-		add_action( 'woocommerce_checkout_create_order', array( $this, 'store_coupon_net_amounts' ), 10, 2 );
-
-		add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'adjust_admin_coupon_display' ), 10, 3 );
-		add_filter( 'woocommerce_order_get_total_discount', array( $this, 'adjust_total_discount_for_invoices' ), 10, 2 );
+		add_action( 'woocommerce_checkout_create_order_coupon_item', array( $this, 'set_correct_coupon_amounts' ), 10, 4 );
 	}
 
 	/**
@@ -71,6 +68,27 @@ final class Coupon_Service {
 	 */
 	public function reset_runtime_state(): void {
 		$this->coupon_runtime_state = array();
+	}
+
+	/**
+	 * Reset one coupon immediately before WooCommerce starts its distribution.
+	 *
+	 * This also covers totals runs started directly by compatibility plugins, where
+	 * `woocommerce_before_calculate_totals` is not fired again.
+	 *
+	 * @param array      $items     Eligible discount items.
+	 * @param \WC_Coupon $coupon    Coupon being distributed.
+	 * @param mixed      $discounts WooCommerce discounts instance.
+	 * @return array
+	 */
+	public function prepare_coupon_distribution( array $items, \WC_Coupon $coupon, $discounts ): array {
+		unset( $discounts );
+
+		if ( $this->is_tax_proof_coupon( $coupon ) ) {
+			unset( $this->coupon_runtime_state[ $coupon->get_code() ] );
+		}
+
+		return $items;
 	}
 
 	/**
@@ -118,7 +136,7 @@ final class Coupon_Service {
 	 *
 	 * @param float      $discount           Current per-line discount amount.
 	 * @param float      $discounting_amount Current net amount that may be discounted.
-	 * @param array      $cart_item          Cart item data.
+	 * @param mixed      $cart_item          Cart item data.
 	 * @param bool       $single             Whether the coupon applies to a single item.
 	 * @param \WC_Coupon $coupon             Coupon object.
 	 * @return float
@@ -126,7 +144,7 @@ final class Coupon_Service {
 	public function apply_coupon_after_tax(
 		float $discount,
 		float $discounting_amount,
-		array $cart_item,
+		$cart_item,
 		bool $single,
 		\WC_Coupon $coupon
 	): float {
@@ -136,28 +154,31 @@ final class Coupon_Service {
 			return $discount;
 		}
 
+		// Fixed-cart amounts are already gross when catalog prices include tax.
+		if ( wc_prices_include_tax() ) {
+			return $discount;
+		}
+
 		$coupon_state = $this->get_coupon_state( $coupon );
 
-		if ( $coupon_state['entered_gross'] <= 0 || $coupon_state['effective_gross'] <= 0 || $coupon_state['remaining_net'] <= 0 ) {
+		if ( $coupon_state['entered_gross'] <= 0 || $coupon_state['effective_gross'] <= 0 || $coupon_state['remaining_gross'] <= 0 ) {
 			return 0.0;
 		}
 
-		$ratio = $coupon_state['entered_gross'] > 0 ? ( $coupon_state['net'] / $coupon_state['entered_gross'] ) : 0.0;
+		$allocation = Gross_Discount_Allocator::allocate(
+			$discount,
+			$discounting_amount,
+			$this->get_cart_item_tax_factor( $cart_item, $discounting_amount ),
+			$coupon_state['remaining_gross']
+		);
 
-		if ( $ratio <= 0 ) {
-			return 0.0;
-		}
-
-		$candidate_discount = max( 0.0, $discount ) * $ratio;
-		$discount_cap       = max( 0.0, $discounting_amount );
-		$applied_net        = min( $candidate_discount, $coupon_state['remaining_net'], $discount_cap );
-
-		$coupon_state['remaining_net'] = max( 0.0, $coupon_state['remaining_net'] - $applied_net );
-		$coupon_state['applied_net']   += $applied_net;
+		$coupon_state['remaining_gross'] = $allocation['remaining_gross'];
+		$coupon_state['applied_net']    += $allocation['net'];
+		$coupon_state['applied_gross']  += $allocation['gross'];
 
 		$this->coupon_runtime_state[ $coupon->get_code() ] = $coupon_state;
 
-		return max( 0.0, $applied_net );
+		return max( 0.0, $allocation['net'] );
 	}
 
 	/**
@@ -196,13 +217,11 @@ final class Coupon_Service {
 	 *
 	 * @param \WC_Order_Item_Coupon $item     Coupon order item.
 	 * @param string                $code     Coupon code.
-	 * @param float                 $discount Incoming discount amount from WooCommerce.
+	 * @param \WC_Coupon            $coupon   Coupon object.
 	 * @param \WC_Order             $order    Order object.
 	 */
-	public function set_correct_coupon_amounts( \WC_Order_Item_Coupon $item, string $code, float $discount, \WC_Order $order ): void {
-		unset( $discount, $order );
-
-		$coupon = new \WC_Coupon( $code );
+	public function set_correct_coupon_amounts( \WC_Order_Item_Coupon $item, string $code, \WC_Coupon $coupon, \WC_Order $order ): void {
+		unset( $order );
 
 		if ( ! $this->is_tax_proof_coupon( $coupon ) ) {
 			return;
@@ -213,61 +232,6 @@ final class Coupon_Service {
 		$item->set_discount( $totals['net'] );
 		$item->set_discount_tax( $totals['tax'] );
 		$this->persist_coupon_item_meta( $item, $totals );
-	}
-
-	/**
-	 * Ensure coupon item totals and meta are persisted on the order.
-	 *
-	 * @param \WC_Order $order Order object.
-	 * @param array     $data  Checkout payload.
-	 */
-	public function store_coupon_net_amounts( \WC_Order $order, array $data ): void {
-		unset( $data );
-
-		if ( $this->synchronize_order_coupon_items( $order ) ) {
-			$order->save();
-		}
-	}
-
-	/**
-	 * Adjust coupon display in the admin order screen.
-	 *
-	 * @param string         $subtotal Formatted subtotal.
-	 * @param \WC_Order_Item $item     Order item.
-	 * @param \WC_Order      $order    Order object.
-	 * @return string
-	 */
-	public function adjust_admin_coupon_display( string $subtotal, \WC_Order_Item $item, \WC_Order $order ): string {
-		if ( ! $item instanceof \WC_Order_Item_Coupon || ! $this->is_tax_proof_coupon_item( $item ) ) {
-			return $subtotal;
-		}
-
-		$amounts = $this->get_coupon_item_totals( $item );
-		$context = array( 'currency' => $order->get_currency() );
-
-		return sprintf(
-			'%1$s <small>(%2$s %3$s / %4$s %5$s)</small>',
-			'-' . wc_price( $amounts['gross'], $context ),
-			esc_html__( 'Net', 'taxproof-coupons-for-woocommerce' ),
-			wc_price( $amounts['net'], $context ),
-			esc_html__( 'Tax', 'taxproof-coupons-for-woocommerce' ),
-			wc_price( $amounts['tax'], $context )
-		);
-	}
-
-	/**
-	 * Return the gross discount total for invoices and document generators.
-	 *
-	 * @param float     $total_discount Current total discount.
-	 * @param \WC_Order $order          Order object.
-	 * @return float
-	 */
-	public function adjust_total_discount_for_invoices( float $total_discount, \WC_Order $order ): float {
-		if ( ! $this->order_has_tax_proof_coupons( $order ) ) {
-			return $total_discount;
-		}
-
-		return $this->get_order_discount_total( $order );
 	}
 
 	/**
@@ -347,11 +311,18 @@ final class Coupon_Service {
 	 * @return float
 	 */
 	public function calculate_expected_order_total( \WC_Order $order ): float {
-		return (float) $order->get_subtotal()
+		$line_total = 0.0;
+
+		foreach ( $order->get_items( 'line_item' ) as $item ) {
+			$line_total += (float) $item->get_total();
+		}
+
+		$total = $line_total
 			+ (float) $order->get_total_fees()
 			+ (float) $order->get_shipping_total()
-			+ (float) $order->get_total_tax()
-			- $this->get_order_discount_total( $order );
+			+ (float) $order->get_total_tax();
+
+		return round( $total, wc_get_price_decimals() );
 	}
 
 	/**
@@ -374,7 +345,7 @@ final class Coupon_Service {
 				continue;
 			}
 
-			$totals = $this->get_coupon_item_totals_for_code( $coupon_item->get_code(), $coupon, $coupon_item );
+			$totals       = $this->get_coupon_item_totals_for_code( $coupon_item->get_code(), $coupon, $coupon_item );
 			$item_updated = false;
 
 			if ( ! $this->coupon_item_matches_totals( $coupon_item, $totals ) ) {
@@ -410,17 +381,14 @@ final class Coupon_Service {
 		$eligible_totals = $this->get_coupon_eligible_cart_totals( $coupon );
 		$entered_gross   = max( 0.0, (float) $coupon->get_amount() );
 		$effective_gross = min( $entered_gross, $eligible_totals['gross'] );
-		$avg_tax_rate    = $eligible_totals['net'] > 0 ? ( $eligible_totals['gross'] / $eligible_totals['net'] ) - 1 : 0.0;
-		$net_discount    = $effective_gross > 0 ? ( $effective_gross / ( 1 + $avg_tax_rate ) ) : 0.0;
 
 		$this->coupon_runtime_state[ $code ] = array(
 			'entered_gross'   => $entered_gross,
 			'effective_gross' => $effective_gross,
 			'eligible_gross'  => $eligible_totals['gross'],
-			'avg_tax_rate'    => $avg_tax_rate,
-			'net'             => max( 0.0, $net_discount ),
-			'remaining_net'   => max( 0.0, $net_discount ),
+			'remaining_gross' => $effective_gross,
 			'applied_net'     => 0.0,
+			'applied_gross'   => 0.0,
 		);
 
 		return $this->coupon_runtime_state[ $code ];
@@ -532,10 +500,33 @@ final class Coupon_Service {
 	}
 
 	/**
+	 * Return the gross/net factor for the current WooCommerce discount share.
+	 *
+	 * @param mixed $cart_item          Cart item data.
+	 * @param float $discounting_amount Current net value being discounted.
+	 * @return float
+	 */
+	private function get_cart_item_tax_factor( $cart_item, float $discounting_amount ): float {
+		if ( ! is_array( $cart_item ) || empty( $cart_item['data'] ) || ! $cart_item['data'] instanceof \WC_Product || $discounting_amount <= 0 ) {
+			return 1.0;
+		}
+
+		$gross = (float) wc_get_price_including_tax(
+			$cart_item['data'],
+			array(
+				'price' => $discounting_amount,
+				'qty'   => 1,
+			)
+		);
+
+		return $gross > 0 ? max( 1.0, $gross / $discounting_amount ) : 1.0;
+	}
+
+	/**
 	 * Return the totals that should be written to the order coupon item.
 	 *
-	 * @param string                      $code   Coupon code.
-	 * @param \WC_Coupon                  $coupon Coupon object.
+	 * @param string                     $code   Coupon code.
+	 * @param \WC_Coupon                 $coupon Coupon object.
 	 * @param \WC_Order_Item_Coupon|null $item   Coupon item.
 	 * @return array<string, float>
 	 */
@@ -553,7 +544,7 @@ final class Coupon_Service {
 		} elseif ( WC()->cart ) {
 			$coupon_state = $this->get_coupon_state( $coupon );
 			$gross        = $coupon_state['effective_gross'];
-			$net          = $coupon_state['net'];
+			$net          = $coupon_state['applied_net'];
 			$tax          = max( 0.0, $gross - $net );
 		}
 

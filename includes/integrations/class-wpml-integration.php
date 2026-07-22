@@ -48,7 +48,6 @@ final class WPML_Integration {
 	public function register_hooks(): void {
 		add_action( 'woocommerce_checkout_order_processed', array( $this, 'fix_order_totals_after_wpml' ), PHP_INT_MAX, 2 );
 		add_action( 'woocommerce_payment_complete', array( $this, 'fix_order_totals_after_wpml' ), PHP_INT_MAX, 1 );
-		add_filter( 'woocommerce_order_get_total', array( $this, 'filter_order_total' ), 999, 2 );
 	}
 
 	/**
@@ -78,26 +77,5 @@ final class WPML_Integration {
 		if ( $updated ) {
 			$order->save();
 		}
-	}
-
-	/**
-	 * Return the corrected order total on frontend and payment-related requests.
-	 *
-	 * @param float     $total Current total.
-	 * @param \WC_Order $order Order object.
-	 * @return float
-	 */
-	public function filter_order_total( float $total, \WC_Order $order ): float {
-		if ( is_admin() && ! wp_doing_ajax() ) {
-			return $total;
-		}
-
-		if ( ! $this->coupon_service->order_has_tax_proof_coupons( $order ) ) {
-			return $total;
-		}
-
-		$expected_total = $this->coupon_service->calculate_expected_order_total( $order );
-
-		return abs( $total - $expected_total ) > 0.01 ? $expected_total : $total;
 	}
 }
