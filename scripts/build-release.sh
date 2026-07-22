@@ -17,6 +17,7 @@ php "$repository_root/scripts/check-version.php" "$release_version" >/dev/null
 mkdir -p "$artifact_dir" "$build_temp/$plugin_slug"
 rm -f "$artifact_path" "$artifact_path.sha256"
 rsync -a --exclude='.phpunit.result.cache' --exclude-from="$repository_root/.distignore" "$repository_root/" "$build_temp/$plugin_slug/"
+"$repository_root/scripts/audit-release-contents.sh" "$build_temp/$plugin_slug" >/dev/null
 
 (
 	cd "$build_temp"
