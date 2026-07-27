@@ -17,5 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends subversion
+
+      - name: Verify Subversion client
+        run: svn --version --quiet
+
       - name: Compare stable release with SVN
         run: ./scripts/verify-svn-sync.sh

@@ -71,6 +71,9 @@ jobs:
       - name: Test release content guards
         run: ./scripts/test-release-contents.sh
 
+      - name: Test SVN drift comparison
+        run: ./scripts/test-svn-drift.sh
+
       - name: Build distribution
         run: ./scripts/build-release.sh
 
