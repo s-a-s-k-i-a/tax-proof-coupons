@@ -1,0 +1,64 @@
+name: Remove superseded Isla WordPress.org assets
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: remove-superseded-isla-wordpress-org-assets
+  cancel-in-progress: false
+
+jobs:
+  remove:
+    name: Remove the ten superseded JPG and GIF assets
+    runs-on: ubuntu-latest
+    environment: wordpress.org
+    env:
+      SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+      SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+
+    steps:
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes subversion
+
+      - name: Remove only the superseded versioned files
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          remove_assets() {
+            local slug="$1"
+            shift
+            local checkout="assets-${slug}"
+
+            svn checkout "https://plugins.svn.wordpress.org/${slug}/assets" "${checkout}"
+
+            for file in "$@"; do
+              svn rm --force "${checkout}/${file}"
+            done
+
+            svn status "${checkout}"
+            svn commit "${checkout}" \
+              --username "${SVN_USERNAME}" \
+              --password "${SVN_PASSWORD}" \
+              --non-interactive \
+              --no-auth-cache \
+              --message "Remove superseded artwork after the approved PNG refresh"
+          }
+
+          remove_assets taxproof-coupons-for-woocommerce \
+            banner-1544x500.jpg banner-772x250.jpg
+
+          remove_assets omppm-override-phpmail-mailpoet \
+            banner-1544x500.jpg banner-772x250.jpg
+
+          remove_assets responsive-mobile-select-menu \
+            banner-1544x500.jpg banner-772x250.jpg
+
+          remove_assets virtual-candles \
+            banner-1544x500.jpg banner-772x250.jpg \
+            icon-128x128.gif icon-256x256.gif
