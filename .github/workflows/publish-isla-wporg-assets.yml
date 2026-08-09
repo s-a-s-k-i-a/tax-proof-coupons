@@ -57,6 +57,11 @@ jobs:
       STAGING_BASE_URL: https://isla-stud.io/wp-content/uploads/wporg-branding-364
 
     steps:
+      - name: Install Subversion
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes subversion
+
       - name: Check out the plugin asset directory
         run: svn checkout "https://plugins.svn.wordpress.org/${{ matrix.slug }}/assets" assets
 
