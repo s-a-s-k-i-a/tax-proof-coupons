@@ -1,6 +1,6 @@
 # Development
 
-GitHub `main` is the canonical source. WordPress.org SVN is updated only from a tested numeric Git tag.
+GitHub `main` is the canonical source. Runtime releases reach WordPress.org SVN only from a tested numeric Git tag. Approved root `readme.txt` metadata updates may use the separate protected, manual publisher described in `RELEASING.md`; runtime files, version tags, historical GitHub release ZIPs, and WordPress.org assets remain unchanged.
 
 Install tooling with `composer install`. Production code must remain compatible with PHP 7.4 and follow WordPress Coding Standards. Do not commit `vendor/`, Playground site state, generated ZIP files, or credentials.
 

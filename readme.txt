@@ -42,11 +42,25 @@ Version 1.0.9 is tested with WordPress 7.0, WooCommerce 10.9.4, Checkout Block, 
 = Why is this needed? =
 WooCommerce calculates fixed-cart discounts as net values before tax. If the amount entered by a shop owner is intended as a gross promotional value, its visible effect can otherwise vary with the applicable tax rate. This plugin performs the gross-to-net conversion for enabled coupons while leaving WooCommerce responsible for tax calculation.
 
+= Why an option for each coupon? =
+A shop may need both kinds of discount. For example, a shop serving private and business customers might advertise “€10 off” to consumers, meaning they should pay exactly €10 less including tax. For business customers, it might offer a discount agreed on a net basis, with tax calculated afterwards.
+
+The checkbox lets the merchant choose the intended meaning for each coupon. It also prevents installing the plugin from automatically changing existing coupons.
+
+“After tax” refers to the intended gross saving. The plugin converts it into the appropriate net discounts, and WooCommerce still handles the tax calculation.
+
+= Why only fixed-cart coupons? =
+Fixed-product coupons need a different calculation model: a €5 fixed-cart coupon means €5 in total; a €5 fixed-product coupon can mean €15 across three eligible units.
+
+Each unit needs its own discount limit and tax conversion, while respecting product restrictions, quantity limits and rounding. Orders and invoices must then reflect the correct total.
+
+There’s also the question of demand. That implementation and its ongoing testing take my time. Concrete merchant use cases would help justify prioritizing it, so it’s a possible roadmap extension rather than a promised release. Currently I did not receive any feature requests regarding support for fixed-product coupons.
+
 = Do I need to recreate existing coupons after updating? =
 No. Valid fixed-cart settings remain unchanged. If a coupon was changed to an unsupported type while an old after-tax flag remained stored, version 1.0.9 shows the option as disabled and removes that inactive flag the next time the coupon is saved.
 
 = Why is the option unavailable for my coupon? =
-The after-tax conversion currently supports fixed-cart coupons only. Percentage and fixed-product coupons keep WooCommerce's native behavior. Support for fixed-product coupons requires separate per-item calculations and is tracked in [GitHub issue #18](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/18) for the 1.1.0 roadmap.
+The after-tax conversion currently supports fixed-cart coupons only. Percentage and fixed-product coupons keep WooCommerce's native behavior. Support for fixed-product coupons requires separate per-item calculations and is tracked as a possible roadmap extension in [GitHub issue #18](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/18), without a promised release.
 
 = What happens if the coupon is larger than the eligible products? =
 The discount is capped at the discountable gross value of the eligible product lines. It does not create a negative payable amount or consume shipping and fees merely to reach the configured coupon value.

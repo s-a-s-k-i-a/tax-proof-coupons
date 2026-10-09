@@ -9,6 +9,8 @@ The test pyramid has four layers:
 
 For release testing, record WordPress, WooCommerce, PHP, browser, third-party plugin versions, inputs, expected values, actual values, and the resulting order ID.
 
+For readme-only publication, run `./scripts/test-wporg-readme.sh` as well as the release-content and drift regression scripts. It uses a disposable real SVN repository to cover success, exact two-path commits, idempotence, main/manual gates, missing credentials, version mismatch, missing tags, non-readme drift (including nested readmes), symlink rejection, concurrent plugin edits, and unrelated repository edits. No live credentials or remote SVN writes are used. Runtime cart/order and licensed-plugin retests are required when their behavior changes, not for prose-only metadata publication.
+
 ## WordPress 7.1 metadata verification — 9 October 2026
 
 For issue [#31](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/31), plugin 1.0.9 passed all three existing Playground blueprints with both `preferredVersions.wp` and CLI `--wp` explicitly set to `7.1`, using `@wp-playground/cli@3.1.46`. A final WP-CLI step asserted the actual WordPress 7.1.x runtime and completion of all four cart scenarios, then persisted a JSON receipt to a separate scratch mount; those receipts were read back outside Playground.
