@@ -56,6 +56,9 @@ jobs:
     needs: validate-build-release
     runs-on: ubuntu-latest
     environment: wordpress.org
+    concurrency:
+      group: wordpress-org-deployment
+      cancel-in-progress: false
     env:
       SLUG: taxproof-coupons-for-woocommerce
     steps:

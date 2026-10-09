@@ -15,6 +15,8 @@ This GitHub repository is the canonical development source. WordPress.org SVN is
 7. Release with a numeric tag such as `1.0.6`. The plugin header, `Plugin::VERSION`, both changelogs, `readme.txt` stable tag, Git tag, GitHub release, release ZIP, SVN `trunk`, and SVN tag must match.
 8. Verify the public WordPress.org version and downloadable ZIP after deployment.
 
+The sole metadata-only exception to step 7 is an approved `readme.txt` update through the manually dispatched **Publish WordPress.org readme** workflow on `main`. It requires the existing `wordpress.org` maintainer approval, verifies version and full non-readme parity against both stable SVN tag and trunk, and changes only those two root readmes. Do not move Git tags, replace historical GitHub release ZIPs, bump the runtime version, or relax the full drift comparison for this exception. See `docs/RELEASING.md`.
+
 ## Safety and scope
 
 - Do not add telemetry, remote code execution, a custom updater, premium licensing, or promotional admin notices.

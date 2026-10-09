@@ -74,6 +74,14 @@ jobs:
       - name: Test SVN drift comparison
         run: ./scripts/test-svn-drift.sh
 
+      - name: Install Subversion for readme publication regressions
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes subversion
+
+      - name: Test protected readme publication
+        run: ./scripts/test-wporg-readme.sh
+
       - name: Build distribution
         run: ./scripts/build-release.sh
 
