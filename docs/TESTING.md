@@ -11,6 +11,16 @@ For release testing, record WordPress, WooCommerce, PHP, browser, third-party pl
 
 For readme-only publication, run `./scripts/test-wporg-readme.sh` as well as the release-content and drift regression scripts. It uses a disposable real SVN repository to cover success, exact two-path commits, idempotence, main/manual gates, missing credentials, version mismatch, missing tags, non-readme drift (including nested readmes), symlink rejection, concurrent plugin edits, and unrelated repository edits. No live credentials or remote SVN writes are used. Runtime cart/order and licensed-plugin retests are required when their behavior changes, not for prose-only metadata publication.
 
+## WordPress 7.1 metadata verification — 9 October 2026
+
+For issue [#31](https://github.com/s-a-s-k-i-a/tax-proof-coupons/issues/31), plugin 1.0.9 passed all three existing Playground blueprints with both `preferredVersions.wp` and CLI `--wp` explicitly set to `7.1`, using `@wp-playground/cli@3.1.46`. A final WP-CLI step asserted the actual WordPress 7.1.x runtime and completion of all four cart scenarios, then persisted a JSON receipt to a separate scratch mount; those receipts were read back outside Playground.
+
+The actual runtime was **WordPress 7.1.3, PHP 8.3.32, WooCommerce 11.2.0** in all three runs. The WPML-contract run recorded `WCML_VERSION=contract-test`; the Advanced Dynamic Pricing smoke recorded the active public plugin version **4.14.0** with its default configuration, not a custom pricing-rule matrix.
+
+Each blueprint passed the existing gross-discount/payable-total expectations: base 35.00/4.27 EUR, mixed 19%/7% rates 50.00/79.70 EUR, oversized tax-inclusive coupon 46.60/0.00 EUR, and tax-inclusive catalog 35.00/4.27 EUR. Each scenario also passed its existing direct repeated-totals assertions.
+
+This cart/runtime verification supports `Tested up to: 7.1`; it does not claim a new browser checkout/order/HPOS test or licensed WPML/WCML/StoreaBill validation on WordPress 7.1. The historical 1.0.9 compatibility paragraph and licensed-plugin receipts remain unchanged. Only disposable Playground sites were used; the persistent LocalWP installation was not modified.
+
 ## Persistent LocalWP release smoke
 
 The dedicated LocalWP site **Tax-proof Coupons for WooCommerce** complements the disposable Playground matrix. Its default WordPress root is `~/Local Sites/tax-proof-coupons-for-woocommerce/app/public`. LocalWP runtime files, database contents, generated products, credentials, and logs stay outside Git.
